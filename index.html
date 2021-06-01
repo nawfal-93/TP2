@@ -1,0 +1,119 @@
+ <!DOCTYPE html>
+    <html lang="fr">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css"
+            integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous">
+        <title>tp-appareils</title>
+    </head>
+
+    <body>
+        <!-- Titre -->
+        <div class="jumbotron">
+            <h1 class="container">TP-appareils</h1>
+        </div>
+        <!-- Application vue -->
+        <div id="app" class="container">
+            <!-- Liste d'appareils -->
+            <ul>
+                <!-- Pour chaque appareil vérifier son état, afficher l'appareil -->
+                <li v-for="(device, index) in devices"
+                    v-bind:class="{ 'list-group-item-success': device.status == 'allumé', 'list-group-item-danger': device.status == 'éteint'}"
+                    class="list-group-item">
+                    <!-- Nom et état de l'appareil -->
+                    <h4>Nom : {{ device.name }} | Etat : {{ device.status }}</h4>
+                    <!-- Boutons d'action -->
+                    <button @click="on(index)" class="btn btn-success"> ON</button>
+                    <button @click="off(index)" class="ml-2 btn btn-danger"> OFF</button>
+                    <button @click="del(index)" class=" ml-2 btn btn-danger">Supprimer</button>
+                </li>
+            </ul>
+            <!-- Appareil à ajouter -->
+            <input type="text" v-model="name">
+            <button @click="add()" class="btn btn-primary">Ajouter</button>
+            <!-- Boutons de modification d'état groupé -->
+            <button @click="onAll()" class="btn btn-success">ALL ON</button>
+            <button @click="offAll()" class="btn btn-danger">ALL OFF</button>
+
+        </div>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+            }
+        </style>
+        <!-- Scripts -->
+        <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+        <script>
+            // Création d'un jeu de données de départ pour le local storage
+            if (localStorage.devices == undefined) {
+                devices = [{
+                        name: 'PS2',
+                        status: 'allumé'
+                    },
+                    {
+                        name: 'TV',
+                        status: 'éteint'
+                    },
+                    {
+                        name: 'Enceinte',
+                        status: 'allumé'
+                    },
+                ];
+                localStorage.devices = JSON.stringify(devices);
+            }
+            // Création de notre application Vue
+            var app = new Vue({
+                // On s'attache à l'élément du DOM souhaité
+                el: '#app',
+                // On déclare les données réactives
+                data: {
+                    // Récupération des données du local storage
+                    devices: JSON.parse(localStorage.devices),
+                    name: ''
+                },
+                methods: {
+                    // Méthode pour allumé un appareil
+                    on(indice) {
+                        this.devices[indice].status = 'allumé';
+                        localStorage.devices = JSON.stringify(this.devices);
+                    },
+                    // Méthode pour éteindre un appareil
+                    off(indice) {
+                        this.devices[indice].status = 'éteint';
+                        localStorage.devices = JSON.stringify(this.devices);
+                    },
+                    // Méthode pour allumé tout les appareils
+                    onAll() {
+                        this.devices.forEach(device => device.status = 'allumé');
+                        localStorage.devices = JSON.stringify(this.devices);
+                    },
+                    // Méthode pour éteindre tout les appareils
+                    offAll() {
+                        this.devices.forEach(device => device.status = 'éteint');
+                        localStorage.devices = JSON.stringify(this.devices);
+                    },
+                    // Méthode pour ajouter un appareil dans le local storage
+                    add() {
+
+                        let device = {};
+                        device.name = this.name;
+                        device.status = 'éteint';
+
+                        this.devices.push(device);
+                        localStorage.devices = JSON.stringify(this.devices);
+                    },
+                    // Méthode pour supprimer un appareil dans le local storage
+                    del(index) {
+                        this.devices.splice(index, 1);
+                        localStorage.devices = JSON.stringify(this.devices);
+                    }
+                }
+            })
+        </script>
+    </body>
+
+    </html>
